@@ -148,6 +148,8 @@ func (s *Scheme) AddUnversionedTypes(version schema.GroupVersion, types ...Objec
 // All objects passed to types should be pointers to structs. The name that go reports for
 // the struct becomes the "kind" field when encoding. Version may not be empty - use the
 // APIVersionInternal constant if you have a type that does not have a formal version.
+//
+// It panics if any type is not a pointer to a struct.
 func (s *Scheme) AddKnownTypes(gv schema.GroupVersion, types ...Object) {
 	s.addObservedVersion(gv)
 	for _, obj := range types {
@@ -164,6 +166,9 @@ func (s *Scheme) AddKnownTypes(gv schema.GroupVersion, types ...Object) {
 // be encoded as. Useful for testing when you don't want to make multiple packages to define
 // your structs. Version may not be empty - use the APIVersionInternal constant if you have a
 // type that does not have a formal version.
+//
+// It panics if gvk.Version is empty, if obj is not a pointer to a struct, or if a different
+// type was already registered for the same GroupVersionKind.
 func (s *Scheme) AddKnownTypeWithName(gvk schema.GroupVersionKind, obj Object) {
 	s.addObservedVersion(gvk.GroupVersion())
 	t := reflect.TypeOf(obj)
